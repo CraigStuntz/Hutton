@@ -147,30 +147,30 @@ let symbol (xs: string) : Parser<string> =
 
 
 
-let rec expr : Parser<int> =
-    plusExpr +++ term
-and plusExpr : Parser<int> =
+let rec expr() : Parser<int> =
+    plusExpr() +++ term()
+and plusExpr() : Parser<int> =
     parser {
-        let! t = term
+        let! t = term()
         let! _ = symbol "+"
-        let! e = expr
+        let! e = expr()
         return (t + e) 
     }
-and term : Parser<int> = 
-    timesExpr +++ factor
-and timesExpr : Parser<int> =
+and term() : Parser<int> = 
+    timesExpr() +++ factor()
+and timesExpr() : Parser<int> =
         parser {
-            let! f = factor
+            let! f = factor()
             let! _ = symbol "*"
-            let! t = term
+            let! t = term()
             return (f * t)
         }
-and factor : Parser<int> = 
-    parenthetical +++ natural
-and parenthetical : Parser<int> = 
+and factor() : Parser<int> = 
+    parenthetical() +++ natural
+and parenthetical() : Parser<int> = 
     parser {
         let! _ = symbol "("
-        let! e = expr
+        let! e = expr()
         let! _ = symbol ")"
         return e
     }
@@ -179,7 +179,7 @@ and parenthetical : Parser<int> =
 
 
 let eval (xs: string) : int =
-    match parse expr xs with
+    match parse (expr ()) xs with
     | [(n, "")]  -> n
     | [(_, out)] -> failwithf "Unused input %s" out
     | _          -> failwithf "Invalid input %s" xs
